@@ -16,6 +16,8 @@ var userRoute = require('./routes/users');
 
 var authRoute = require('./routes/auth');
 
+var postRoute = require('./routes/posts');
+
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
@@ -26,8 +28,9 @@ mongoose.connect(process.env.MONGO_URL, {
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
-app.use('/api/user', userRoute);
+app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/posts', postRoute);
 app.listen(3006, function () {
   console.log("Server is running.");
 });
