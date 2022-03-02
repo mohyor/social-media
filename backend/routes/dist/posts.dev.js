@@ -220,7 +220,7 @@ router.get("/:id", function _callee5(req, res) {
     }
   }, null, null, [[0, 7]]);
 });
-router.get("/timeline/all", function _callee6(req, res) {
+router.get("/timeline/:userId", function _callee6(req, res) {
   var currentUser, userPosts, friendPosts;
   return regeneratorRuntime.async(function _callee6$(_context6) {
     while (1) {
@@ -228,7 +228,7 @@ router.get("/timeline/all", function _callee6(req, res) {
         case 0:
           _context6.prev = 0;
           _context6.next = 3;
-          return regeneratorRuntime.awrap(User.findById(req.body.userId));
+          return regeneratorRuntime.awrap(User.findById(req.params.userId));
 
         case 3:
           currentUser = _context6.sent;
@@ -248,7 +248,7 @@ router.get("/timeline/all", function _callee6(req, res) {
 
         case 9:
           friendPosts = _context6.sent;
-          res.json(userPosts.concat.apply(userPosts, _toConsumableArray(friendPosts)));
+          res.status(200).json(userPosts.concat.apply(userPosts, _toConsumableArray(friendPosts)));
           _context6.next = 16;
           break;
 
@@ -263,5 +263,42 @@ router.get("/timeline/all", function _callee6(req, res) {
       }
     }
   }, null, null, [[0, 13]]);
+});
+router.get("/profile/:username", function _callee7(req, res) {
+  var user, posts;
+  return regeneratorRuntime.async(function _callee7$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          _context7.prev = 0;
+          _context7.next = 3;
+          return regeneratorRuntime.awrap(User.findOne({
+            username: req.params.username
+          }));
+
+        case 3:
+          user = _context7.sent;
+          _context7.next = 6;
+          return regeneratorRuntime.awrap(Post.find({
+            userId: user._id
+          }));
+
+        case 6:
+          posts = _context7.sent;
+          res.status(200).json(posts);
+          _context7.next = 13;
+          break;
+
+        case 10:
+          _context7.prev = 10;
+          _context7.t0 = _context7["catch"](0);
+          res.status(500).json(_context7.t0);
+
+        case 13:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  }, null, null, [[0, 10]]);
 });
 module.exports = router;
