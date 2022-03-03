@@ -197,84 +197,55 @@ router.get("/:id", function _callee4(req, res) {
       }
     }
   }, null, null, [[0, 8]]);
-}); //follow a user
-
-router.put("/:id/follow", function _callee5(req, res) {
-  var user, currentUser;
+});
+router.get("/friends/:userId", function _callee5(req, res) {
+  var user, friends, friendList;
   return regeneratorRuntime.async(function _callee5$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
-          if (!(req.body.userId !== req.params.id)) {
-            _context5.next = 24;
-            break;
-          }
+          _context5.prev = 0;
+          _context5.next = 3;
+          return regeneratorRuntime.awrap(User.findById(req.params.userId));
 
-          _context5.prev = 1;
-          _context5.next = 4;
-          return regeneratorRuntime.awrap(User.findById(req.params.id));
-
-        case 4:
+        case 3:
           user = _context5.sent;
-          _context5.next = 7;
-          return regeneratorRuntime.awrap(User.findById(req.body.userId));
+          _context5.next = 6;
+          return regeneratorRuntime.awrap(Promise.all(user.followings.map(function (friendId) {
+            return User.findById(friendId);
+          })));
 
-        case 7:
-          currentUser = _context5.sent;
-
-          if (user.followers.includes(req.body.userId)) {
-            _context5.next = 16;
-            break;
-          }
-
-          _context5.next = 11;
-          return regeneratorRuntime.awrap(user.updateOne({
-            $push: {
-              followers: req.body.userId
-            }
-          }));
-
-        case 11:
-          _context5.next = 13;
-          return regeneratorRuntime.awrap(currentUser.updateOne({
-            $push: {
-              followings: req.params.id
-            }
-          }));
-
-        case 13:
-          res.status(200).json("user has been followed");
-          _context5.next = 17;
+        case 6:
+          friends = _context5.sent;
+          friendList = [];
+          friends.map(function (friend) {
+            var _id = friend._id,
+                username = friend.username,
+                profilePicture = friend.profilePicture;
+            friendList.push({
+              _id: _id,
+              username: username,
+              profilePicture: profilePicture
+            });
+          });
+          res.status(200).json(friendList);
+          _context5.next = 15;
           break;
 
-        case 16:
-          res.status(403).json("you already follow this user");
-
-        case 17:
-          _context5.next = 22;
-          break;
-
-        case 19:
-          _context5.prev = 19;
-          _context5.t0 = _context5["catch"](1);
+        case 12:
+          _context5.prev = 12;
+          _context5.t0 = _context5["catch"](0);
           res.status(500).json(_context5.t0);
 
-        case 22:
-          _context5.next = 25;
-          break;
-
-        case 24:
-          res.status(403).json("you cant follow yourself");
-
-        case 25:
+        case 15:
         case "end":
           return _context5.stop();
       }
     }
-  }, null, null, [[1, 19]]);
-}); //unfollow a user
+  }, null, null, [[0, 12]]);
+}); //follow a user
 
-router.put("/:id/unfollow", function _callee6(req, res) {
+router.put("/:id/follow", function _callee6(req, res) {
   var user, currentUser;
   return regeneratorRuntime.async(function _callee6$(_context6) {
     while (1) {
@@ -297,14 +268,14 @@ router.put("/:id/unfollow", function _callee6(req, res) {
         case 7:
           currentUser = _context6.sent;
 
-          if (!user.followers.includes(req.body.userId)) {
+          if (user.followers.includes(req.body.userId)) {
             _context6.next = 16;
             break;
           }
 
           _context6.next = 11;
           return regeneratorRuntime.awrap(user.updateOne({
-            $pull: {
+            $push: {
               followers: req.body.userId
             }
           }));
@@ -312,18 +283,18 @@ router.put("/:id/unfollow", function _callee6(req, res) {
         case 11:
           _context6.next = 13;
           return regeneratorRuntime.awrap(currentUser.updateOne({
-            $pull: {
+            $push: {
               followings: req.params.id
             }
           }));
 
         case 13:
-          res.status(200).json("user has been unfollowed");
+          res.status(200).json("user has been followed");
           _context6.next = 17;
           break;
 
         case 16:
-          res.status(403).json("you dont follow this user");
+          res.status(403).json("you already follow this user");
 
         case 17:
           _context6.next = 22;
@@ -339,11 +310,86 @@ router.put("/:id/unfollow", function _callee6(req, res) {
           break;
 
         case 24:
-          res.status(403).json("you cant unfollow yourself");
+          res.status(403).json("you cant follow yourself");
 
         case 25:
         case "end":
           return _context6.stop();
+      }
+    }
+  }, null, null, [[1, 19]]);
+}); //unfollow a user
+
+router.put("/:id/unfollow", function _callee7(req, res) {
+  var user, currentUser;
+  return regeneratorRuntime.async(function _callee7$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          if (!(req.body.userId !== req.params.id)) {
+            _context7.next = 24;
+            break;
+          }
+
+          _context7.prev = 1;
+          _context7.next = 4;
+          return regeneratorRuntime.awrap(User.findById(req.params.id));
+
+        case 4:
+          user = _context7.sent;
+          _context7.next = 7;
+          return regeneratorRuntime.awrap(User.findById(req.body.userId));
+
+        case 7:
+          currentUser = _context7.sent;
+
+          if (!user.followers.includes(req.body.userId)) {
+            _context7.next = 16;
+            break;
+          }
+
+          _context7.next = 11;
+          return regeneratorRuntime.awrap(user.updateOne({
+            $pull: {
+              followers: req.body.userId
+            }
+          }));
+
+        case 11:
+          _context7.next = 13;
+          return regeneratorRuntime.awrap(currentUser.updateOne({
+            $pull: {
+              followings: req.params.id
+            }
+          }));
+
+        case 13:
+          res.status(200).json("user has been unfollowed");
+          _context7.next = 17;
+          break;
+
+        case 16:
+          res.status(403).json("you dont follow this user");
+
+        case 17:
+          _context7.next = 22;
+          break;
+
+        case 19:
+          _context7.prev = 19;
+          _context7.t0 = _context7["catch"](1);
+          res.status(500).json(_context7.t0);
+
+        case 22:
+          _context7.next = 25;
+          break;
+
+        case 24:
+          res.status(403).json("you cant unfollow yourself");
+
+        case 25:
+        case "end":
+          return _context7.stop();
       }
     }
   }, null, null, [[1, 19]]);

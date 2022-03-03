@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LoginFailure = exports.LoginSuccess = exports.LoginStart = void 0;
+exports.UnFollow = exports.Follow = exports.LoginFailure = exports.LoginSuccess = exports.LoginStart = void 0;
 
 var LoginStart = function LoginStart(userCredentials) {
   return {
@@ -30,3 +30,21 @@ var LoginFailure = function LoginFailure(error) {
 };
 
 exports.LoginFailure = LoginFailure;
+
+var Follow = function Follow(userId) {
+  return {
+    type: "FOLLOW",
+    payload: userId
+  };
+};
+
+exports.Follow = Follow;
+
+var UnFollow = function UnFollow(userId) {
+  return {
+    type: "UNFOLLOW",
+    payload: userId
+  };
+};
+
+exports.UnFollow = UnFollow;

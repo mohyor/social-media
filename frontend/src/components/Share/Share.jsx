@@ -1,7 +1,7 @@
 import './Share.css'
 import { PermMedia, Label, Room, EmojiEmotions } from "@material-ui/icons"
 import { AuthContext } from '../../context/AuthContext';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import axios from 'axios';
 
 export default function Share() {
@@ -14,9 +14,22 @@ export default function Share() {
     e.preventDefault()
     const newPost = { userId: user._id, desc: desc.current.value }
 
-    try {
-      await axios.post("posts", newPost)
-    } catch (err) {}
+    if(file) {
+      const data = new FormData()
+      const fileName = Date.now() + file.name 
+      data.append("name", fileName)
+      data.append('file', file)
+      newPost.img =  fileName
+      console.log(newPost)
+
+      try { await axios.post('api/upload/', data)}
+      catch(err) { console.log(err)}    
+    }
+    try { 
+      await axios.post("api/posts/", newPost) 
+      window.location.reload() // refreshes the page after adding a new post.
+    } 
+    catch (err) {console.log(err)}
   }
 
   return (
@@ -27,6 +40,13 @@ export default function Share() {
        <input placeholder={"What's in your mind " + user.username + "?"} className="shareInput" ref={desc} />
       </div>
       <hr className="shareHr" />
+      {/* Creates a link to view your file before sending it. */}
+      {file && (
+        <div className="shareImgContainer">
+          <img className='shareImg' src={URL.createObjectURL(file)} alt='' />
+          <Cancel className="shareCancelImg" onClick={() => setFile(null)} />
+        </div>
+      )}
       <form className="shareBottom" onSubmit={submitHandler}>
        <div className="shareOptions">
         <label htmlFor='file' className="shareOption">

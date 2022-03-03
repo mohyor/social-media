@@ -12,6 +12,10 @@ var helmet = require('helmet');
 
 var morgan = require('morgan');
 
+var multer = require('multer');
+
+var path = require('path');
+
 var userRoute = require('./routes/users');
 
 var authRoute = require('./routes/auth');
@@ -25,9 +29,29 @@ mongoose.connect(process.env.MONGO_URL, {
 }, function () {
   console.log('Connected to MongoDB.');
 });
+app.use('/images', express["static"](path.join(__dirname, 'public/images')));
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
+var storage = multer.diskStorage({
+  destination: function destination(req, file, cb) {
+    cb(null, "public/images");
+  },
+  filename: function filename(req, file, cb) {
+    cb(null, req.body.name);
+  } //filename: (req, file, cb) => { cb(null, req.body.name)}
+
+});
+var upload = multer({
+  storage: storage
+});
+app.post('/api/upload', upload.single("file"), function (req, res) {
+  try {
+    return res.status(200).json("File uploaded successfully.");
+  } catch (err) {
+    console.log(err);
+  }
+});
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/posts', postRoute);
